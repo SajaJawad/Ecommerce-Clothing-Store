@@ -3,6 +3,8 @@ import Title from "../components/Title";
 import CartTotal from "../components/CartTotal";
 import { assets } from "../assets/assets";
 import { ShopContext } from "../context/ShopContext";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const PlaceOrder = () => {
   const [method, setMethod] = useState("cod");
@@ -21,7 +23,7 @@ const PlaceOrder = () => {
     phone: ''
   })
   const onChangeHandler = (event) => {
-    const name = event.target.value;
+    const name = event.target.name;
     const value = event.target.value;
 
     setFormData(data => ({ ...data, [name]: value }))
@@ -40,13 +42,41 @@ const PlaceOrder = () => {
             if (itemInfo) {
               itemInfo.size = item
               itemInfo.quantity = cartItems[items][item]
+              orderItems.push(itemInfo)
             }
           }
         }
       }
 
-    } catch (error) {
 
+      let orderData = {
+        address: formData,
+        items: orderItems,
+        amount: getCartAmount() + delivery_fee
+      }
+
+      switch (method) {
+        //api calls dor COD
+        case 'cod':
+        const response = await axios.post(backendUrl + "/api/order/place",orderData,{headers:{token}})
+        
+
+        if(response.data.success){
+          setCartItems({})
+          navigate('/orders')
+        } else{
+          toast.error(response.data.message)
+        }
+          break;
+
+        default:
+          break;
+      }
+
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message)
+      
     }
   }
 
