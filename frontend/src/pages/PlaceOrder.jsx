@@ -56,7 +56,7 @@ const PlaceOrder = () => {
       }
 
       switch (method) {
-        //api calls dor COD
+        //Api Calls dor COD
         case 'cod':
         const response = await axios.post(backendUrl + "/api/order/place",orderData,{headers:{token}})
         
